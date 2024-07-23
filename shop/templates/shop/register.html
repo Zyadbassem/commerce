@@ -1,0 +1,16 @@
+{% extends 'shop/layout.html' %}
+{% block main %}
+<main>
+    <h2 class="text-over-form">register</h2>
+    <form class="registerInputs" action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <input type="text" placeholder="username" autocomplete="off" autofocus name="username">
+        <input type="password" placeholder="password" autocomplete="off" name="password">
+        <input type="text" placeholder="password(again)" autocomplete="off" name="passwordCon">
+        <button type="submit" class="sign-button">register</button>
+    </form>
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+</main>
+{% endblock %}

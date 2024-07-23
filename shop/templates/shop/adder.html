@@ -1,0 +1,23 @@
+{% extends 'shop/layout.html' %}
+{% block main %}
+<main>
+    <h2 class="text-over-form">add new item</h2>
+    <form class="registerInputs" action="{% url 'addItems' %}" method="post">
+        {% csrf_token %}
+        <input type="text" placeholder="item title" autocomplete="off" autofocus name="item_name" required>
+        <input type="number" placeholder="item price in $" autocomplete="off" name="item_price" min="1" required>
+        <input type="text" placeholder="item image url" autocomplete="off" name="item_image" required>
+        <select name="item_type">
+            <option value="">item type</option>
+            <option value="games">games</option>
+            <option value="phones">phones</option>
+            <option value="museic">music</option>
+        </select>
+        <textarea name="item_description" placeholder="description"></textarea>
+        <button type="submit" class="sign-button">add</button>
+    </form>
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+</main>
+{% endblock %}

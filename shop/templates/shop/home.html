@@ -1,0 +1,23 @@
+{% extends 'shop/layout.html' %}
+{% block main %}
+{% if types %}
+<div class="types">
+    <a href="{% url 'types' typeClicked='games' %}">games</a>
+    <a href="{% url 'types' typeClicked='phones' %}">phones</a>
+    <a href="{% url 'types' typeClicked='music' %}">music</a>
+</div>
+{% else %}
+<h3>watchlist</h3>
+{% endif %}
+<div class="wrapper">
+    <div class="itemsContainer">
+        {% for item in items %}
+        <a class="item" href="{% url 'itemPage' clickedItemTitle=item.item_name %}">
+            <img src="{{ item.item_image }}" alt="">
+            <p class="itemname">{{ item.item_name }}</p>
+            <p class="itemprice">${{ item.item_price }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

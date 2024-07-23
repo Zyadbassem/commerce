@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>stolen things store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <a href="{% url 'home' %}"><h1>StolenThings</h1></a>
+        <div class="headerLinks">
+            {% if username %}
+            <a href="{% url 'addItems' %}" id="add-button">+</a>
+            <a>{{ username }}</a>
+            <a href="{% url 'logout' %}">logout</a>
+            <a href="{% url 'watchlist' %}">watchlist</a>
+            {% else %}
+            <a href="{% url 'sign' %}">sign in</a>
+            <a href="{% url 'register' %}">register</a>
+            {% endif %}
+        </div>
+    </header>
+    {% block main %}
+
+    {% endblock %}
+    <footer>
+        <div class="footerLinks">
+            <a href="/">facebook</a>
+            <a href="/">instagram</a>
+            <a href="/">X</a>
+        </div>
+        <p class="copyrights">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam ad vero illum blanditiis eius. Explicabo vero, cumque perferendis, eum, distinctio eaque harum sed dolores adipisci ducimus alias quaerat deserunt ullam.</p>
+    </footer>
+</body>
+</html>
