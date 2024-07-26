@@ -6,11 +6,15 @@
         <p class="imageItemTitle">{{ item.item_name }}</p>
         <p class="imageItemprice">${{ item.item_price }}</p>    
         {% if not userAdmin %}
-        <form action="{{ item.item_name }}" class="registerInputs" method="post">
+        <form action="{{ item.pk }}" class="registerInputs" method="post">
             {% csrf_token %}
             <input type="number" placeholder="Bid" name="newBid">
             <button class="sign-button" type="submit">Bid</button>
+            {% if not inWatchlist %}
             <a href="{% url 'watchlistAdder' itemToAdd=item.pk %}" class="sign-button">Add to watchlist</a>
+            {% else %}
+            <a href="{% url 'watchlistRemover' itemToRemove=item.pk %}"class="sign-button">remove from watchlist</a>
+            {% endif %}
         </form>    
         {% else %}
         <a href="{% url 'bidEnder' itemToEndBid=item.item_name %}" class="sign-button">endbid</a>

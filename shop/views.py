@@ -102,16 +102,19 @@ def addItems(request):
 def itemPage(request, clickedItemTitle):
     if 'username' in request.session:
         #get the clicked item
-        clickedItem = ItemUpdated.objects.filter(item_name= clickedItemTitle).first()
+        clickedItem = ItemUpdated.objects.filter(pk= clickedItemTitle).first()
         #get user info
         activeUser = User.objects.filter(username=request.session['username']).first()
         if not clickedItem:
             return HttpResponse('404item not found')
         #check if the active user is the one who is accessing the page
         adminUser = False
-        userItemChecker = ItemUserConnect.objects.filter(userPlacedABid=activeUser, itemGotBid=clickedItem, bidAdmin=True).first()
+        inWatchlist = True
+        userItemChecker = ItemUserConnect.objects.filter(userPlacedABid=activeUser, itemGotBid=clickedItem).first()
         if userItemChecker:
-            adminUser = True
+            adminUser = userItemChecker.bidAdmin
+        else:
+            inWatchlist = False
         #if the user sends a form 
         if request.method == 'POST':
             #get the new bid the user will enter
@@ -127,7 +130,7 @@ def itemPage(request, clickedItemTitle):
             clickedItem.item_price = newBid
             clickedItem.save()
             return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username})
-        return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser})
+        return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist})
     return redirect('sign')
 
 def bidEnder(request, itemToEndBid):
@@ -192,4 +195,23 @@ def watchlistAdder(request, itemToAdd):
         return redirect('watchlist')
     
     #if user isn't signed in 
+    return redirect('sign')
+
+def watchlistRemover(requset, itemToRemove):
+    #check if user is signed
+    if 'username' in requset.session:
+        #get user and item
+        user = User.objects.get(username=requset.session['username'])
+        item = ItemUpdated.objects.get(pk=itemToRemove)
+        
+        #remove from connectioon
+        connection = ItemUserConnect.objects.filter(userPlacedABid=user, itemGotBid=item, bidAdmin=False).first()
+        if not connection:
+            return HttpResponse('error')
+        connection.delete()
+
+        #redirecting to watchlist
+        return redirect('watchlist')
+    
+    #if user isn't signed in
     return redirect('sign')
