@@ -12,4 +12,5 @@ urlpatterns = [
     path('watchlist/', views.watchlist, name="watchlist"),
     path('addtowatchlist/<int:itemToAdd>', views.watchlistAdder, name="watchlistAdder"),
     path('removefromwatchlist/<int:itemToRemove>', views.watchlistRemover, name="watchlistRemover"),
+    path('comments/<int:itempk>', views.comments, name="comments")
 ]

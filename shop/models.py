@@ -26,5 +26,10 @@ class ItemUserConnect(models.Model):
     itemGotBid = models.ForeignKey(ItemUpdated, on_delete=models.CASCADE)
     bidAdmin = models.BooleanField(default=False)
 
+class Comment(models.Model):
+    comment = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey(ItemUpdated, on_delete=models.CASCADE)    
+
 
 

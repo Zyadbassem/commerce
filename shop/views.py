@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from .models import User, ItemUpdated, Bid, ItemUserConnect
+from .models import User, ItemUpdated, Bid, ItemUserConnect, Comment
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import logout as django_logout
 def sign(request):
@@ -105,6 +105,8 @@ def itemPage(request, clickedItemTitle):
         clickedItem = ItemUpdated.objects.filter(pk= clickedItemTitle).first()
         #get user info
         activeUser = User.objects.filter(username=request.session['username']).first()
+        #get comments
+        comments = Comment.objects.filter(item=clickedItem)
         if not clickedItem:
             return HttpResponse('404item not found')
         #check if the active user is the one who is accessing the page
@@ -121,16 +123,16 @@ def itemPage(request, clickedItemTitle):
             newBid = request.POST.get('newBid')
             #check the new bid
             if not newBid:
-                return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'error': 'bid not valid'})
+                return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist, 'error': 'bid not valid', 'comments': comments})
             newBid = float(newBid)
             if not newBid or newBid < clickedItem.item_price:
-                return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'error': 'bid not valid'})
+                return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist, 'error': 'bid not valid', 'comments': comments})
             bidAdder = Bid(buyerId=activeUser, itemId=clickedItem, bidAmount=newBid)
             bidAdder.save()
             clickedItem.item_price = newBid
             clickedItem.save()
-            return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username})
-        return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist})
+            return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist, 'comments': comments})
+        return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'userAdmin': adminUser, 'inWatchlist': inWatchlist, 'comments': comments})
     return redirect('sign')
 
 def bidEnder(request, itemToEndBid):
@@ -197,11 +199,11 @@ def watchlistAdder(request, itemToAdd):
     #if user isn't signed in 
     return redirect('sign')
 
-def watchlistRemover(requset, itemToRemove):
+def watchlistRemover(request, itemToRemove):
     #check if user is signed
-    if 'username' in requset.session:
+    if 'username' in request.session:
         #get user and item
-        user = User.objects.get(username=requset.session['username'])
+        user = User.objects.get(username=request.session['username'])
         item = ItemUpdated.objects.get(pk=itemToRemove)
         
         #remove from connectioon
@@ -215,3 +217,19 @@ def watchlistRemover(requset, itemToRemove):
     
     #if user isn't signed in
     return redirect('sign')
+
+def comments(request, itempk):
+    #checj=k if user is logged in
+    if 'username' in request.session:
+        #get user info 
+        user = User.objects.get(username=request.session['username'])
+        #get item info
+        item = ItemUpdated.objects.get(pk=itempk)
+        if request.method == 'POST':
+            #get the comment
+            comment = request.POST.get('comment')
+            commentCreator = Comment(comment=comment, user=user, item=item)
+            commentCreator.save()
+            return redirect('itemPage', clickedItemTitle=itempk)
+        return HttpResponse('error 1')
+    return HttpResponse('error2')

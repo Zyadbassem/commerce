@@ -1,5 +1,5 @@
 from django.contrib import admin
-from shop.models import User, Bid, ItemUpdated, ItemUserConnect
+from shop.models import User, Bid, ItemUpdated, ItemUserConnect, Comment
 
 
 
@@ -23,5 +23,10 @@ class ItemUserConnectAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(ItemUserConnect, ItemUserConnectAdmin)
+
+class CommentAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Comment, CommentAdmin)
 
 # Register your models here.

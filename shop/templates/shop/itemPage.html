@@ -4,7 +4,10 @@
     <img src="{{ item.item_image }}" alt="item" class="big-image">
     <div class="itemPagetextContainer">
         <p class="imageItemTitle">{{ item.item_name }}</p>
-        <p class="imageItemprice">${{ item.item_price }}</p>    
+        <p class="imageItemprice">${{ item.item_price }}</p>  
+        <div class="description" style="margin: 20px; text-align: center;">
+            <p class="description">{{ item.item_description }}</p>
+        </div>  
         {% if not userAdmin %}
         <form action="{{ item.pk }}" class="registerInputs" method="post">
             {% csrf_token %}
@@ -15,16 +18,26 @@
             {% else %}
             <a href="{% url 'watchlistRemover' itemToRemove=item.pk %}"class="sign-button">remove from watchlist</a>
             {% endif %}
-        </form>    
+        </form>
+        <div class="commentContainer">
+            <form action="{% url 'comments' itempk=item.pk %}" class="registerInputs" method="post" style="width: 30%;">
+                {% csrf_token %}
+                <input type="text" placeholder="comment" name="comment">
+                <button class="sign-button" type="submit">post</button>
+            </form> 
+            <ul style="width: 25%;">
+                <li>comments</li>
+                {% for comment in comments %}
+                <li>{{ comment.comment }}</li>
+                {% endfor %}
+            </ul>
+        </div>   
         {% else %}
         <a href="{% url 'bidEnder' itemToEndBid=item.item_name %}" class="sign-button">endbid</a>
         {% endif %}
         {% if error %}
     <p class="error">{{ error }}</p>
     {% endif %}
-    </div>
-    <div class="description" style="margin: 20px;">
-        <p class="description">{{ item.item_description }}</p>
     </div>
 </main>
 {% endblock %}
