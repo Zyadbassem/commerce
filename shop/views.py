@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from .models import User, ItemUpdated, Bid, ItemUserConnect, Comment
+from .models import User, ItemUpdated, Bid, ItemUserConnect, Comment, FinishBids
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import logout as django_logout
 def sign(request):
@@ -118,6 +118,9 @@ def itemPage(request, clickedItemTitle):
         else:
             inWatchlist = False
         #if the user sends a form 
+        checkIfTheBidIsEnded = FinishBids.objects.filter(item=clickedItem).first()
+        if checkIfTheBidIsEnded:
+            return render(request, 'shop/itemPage.html', {'item': clickedItem, 'username': activeUser.username, 'ended': True, 'userWinner': checkIfTheBidIsEnded.buyer.username})
         if request.method == 'POST':
             #get the new bid the user will enter
             newBid = request.POST.get('newBid')
@@ -141,13 +144,16 @@ def bidEnder(request, itemToEndBid):
         #get user and item info
         userCreator = User.objects.get(username=request.session['username'])
         itemWannaEnd = ItemUpdated.objects.get(item_name=itemToEndBid)
+        #get the winner
+        winnerUser = Bid.objects.get(itemId=itemWannaEnd, bidAmount=itemWannaEnd.item_price).buyerId
         #check if the user is the admin
         checker = ItemUserConnect.objects.get(userPlacedABid=userCreator, itemGotBid=itemWannaEnd)
         if not checker:
             return HttpResponse('access denied')
-        #delete item from page
-        itemWannaEnd.delete()
-        return redirect('home')
+        #add it to ended bids
+        bidToEnd = FinishBids(buyer=winnerUser, seller=userCreator, item=itemWannaEnd, lastBid=itemWannaEnd.item_price)
+        bidToEnd.save()
+        return redirect('itemPage', clickedItemTitle=itemWannaEnd.pk)
     return redirect('sign')
 
     
@@ -169,8 +175,6 @@ def watchlist(request):
 
         #get items user put in watchlist
         allItems = ItemUserConnect.objects.filter(userPlacedABid=user, bidAdmin=False)
-        if not allItems:
-            return HttpResponse('no items')
         
         #loop through the elements in all items
         all_item_objects = [item.itemGotBid for item in allItems]
@@ -219,7 +223,7 @@ def watchlistRemover(request, itemToRemove):
     return redirect('sign')
 
 def comments(request, itempk):
-    #checj=k if user is logged in
+    #check if user is logged in
     if 'username' in request.session:
         #get user info 
         user = User.objects.get(username=request.session['username'])

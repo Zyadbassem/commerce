@@ -8,6 +8,10 @@
         <div class="description" style="margin: 20px; text-align: center;">
             <p class="description">{{ item.item_description }}</p>
         </div>  
+        {% if ended %}
+        <h3 style="text-align: center;">BidEnded</h3>
+        <p style="text-align: center;">winner: {{ userWinner }}</p>
+        {% else %}
         {% if not userAdmin %}
         <form action="{{ item.pk }}" class="registerInputs" method="post">
             {% csrf_token %}
@@ -34,6 +38,7 @@
         </div>   
         {% else %}
         <a href="{% url 'bidEnder' itemToEndBid=item.item_name %}" class="sign-button">endbid</a>
+        {% endif %}
         {% endif %}
         {% if error %}
     <p class="error">{{ error }}</p>

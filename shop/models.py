@@ -29,7 +29,14 @@ class ItemUserConnect(models.Model):
 class Comment(models.Model):
     comment = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item = models.ForeignKey(ItemUpdated, on_delete=models.CASCADE)    
+    item = models.ForeignKey(ItemUpdated, on_delete=models.CASCADE)  
+
+
+class FinishBids(models.Model):
+    lastBid = models.DecimalField(decimal_places=3,max_digits=10)
+    buyer = models.ForeignKey(User, related_name='bought_bids', on_delete=models.CASCADE, default=1)
+    seller = models.ForeignKey(User, related_name='sold_bids', on_delete=models.CASCADE, default=1)
+    item = models.ForeignKey(ItemUpdated, on_delete=models.CASCADE)
 
 
 
